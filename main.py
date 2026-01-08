@@ -183,6 +183,14 @@ def update_device_status(device_id, status="online"):
     c.close()
     conn.close()
 
+@app.route('/')
+def index():
+    return jsonify({
+        'status': 'CJSPANEL API Active',
+        'version': '1.0.0',
+        'frontend': 'https://cjspanel.netlify.app'
+    })
+
 # ==================== API ROUTES ====================
 
 @app.route('/api/login', methods=['POST'])
