@@ -146,26 +146,6 @@ python main.py
 
 ---
 
-## 🌐 Deployment
-
-### Deploy to Render (Recommended - Free!)
-
-1. **Fork** this repository
-2. Go to [Render.com](https://render.com) → **New Web Service**
-3. Connect your GitHub → Select `cjspanel`
-4. Render auto-detects `render.yaml` ✨
-5. Add environment variables:
-   ```
-   ADMIN_USERNAME = YourSecureUsername
-   ADMIN_PASSWORD = YourSecurePassword123!
-   PRODUCTION = true
-   ```
-6. **Deploy!** 🚀
-
-Your panel will be live at: `https://cjspanel.onrender.com`
-
----
-
 ## 🔐 Default Credentials
 
 | Field        | Value      |
@@ -183,7 +163,6 @@ Your panel will be live at: `https://cjspanel.onrender.com`
 cjspanel/
 ├── 🐍 main.py              # Core application (security-hardened)
 ├── 📦 requirements.txt     # Dependencies
-├── 🚀 render.yaml          # Render deployment config
 ├── 🪟 start.bat            # Windows launcher
 ├── 🐧 start.sh             # Linux/Mac launcher
 ├── 📁 templates/           # Hacker-themed UI
