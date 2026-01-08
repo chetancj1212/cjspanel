@@ -1,0 +1,42 @@
+# Dependencies
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.venv/
+
+# Environment files (contain secrets)
+.env
+*.env.local
+
+# Database (don't commit to git)
+*.db
+*.sqlite
+*.sqlite3
+
+# Data files
+data/
+uploads/
+
+# SSL certificates (local dev only)
+*.pem
+*.key
+*.crt
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Flask session files
+flask_session/

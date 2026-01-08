@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>LionHook - Login</title>
+    <title>Cjspanel - Access Terminal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -10,76 +13,408 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Share Tech Mono', monospace;
+            background: #0a0a0a;
             min-height: 100vh;
             display: flex;
-            align-items: center;
             justify-content: center;
-            color: #333;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Matrix rain effect */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.15;
+        }
+
+        /* Scanline effect */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.1),
+                rgba(0, 0, 0, 0.1) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+        }
+
+        /* Glowing grid */
+        .grid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background-image: 
+                linear-gradient(rgba(0, 255, 0, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 0, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 50px 50px; }
         }
 
         .login-container {
-            background: white;
+            position: relative;
+            z-index: 10;
+            width: 420px;
+            background: rgba(0, 0, 0, 0.85);
+            border: 1px solid #00ff00;
+            border-radius: 5px;
             padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
+            box-shadow: 
+                0 0 20px rgba(0, 255, 0, 0.3),
+                inset 0 0 20px rgba(0, 255, 0, 0.05);
+            animation: containerGlow 2s ease-in-out infinite alternate;
         }
 
-        .login-container h1 {
+        @keyframes containerGlow {
+            from { box-shadow: 0 0 20px rgba(0, 255, 0, 0.3), inset 0 0 20px rgba(0, 255, 0, 0.05); }
+            to { box-shadow: 0 0 40px rgba(0, 255, 0, 0.5), inset 0 0 30px rgba(0, 255, 0, 0.1); }
+        }
+
+        .terminal-header {
+            display: flex;
+            align-items: center;
             margin-bottom: 30px;
-            color: #667eea;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 255, 0, 0.3);
+        }
+
+        .terminal-dots {
+            display: flex;
+            gap: 8px;
+            margin-right: 15px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .dot.red { background: #ff3b3b; box-shadow: 0 0 10px #ff3b3b; }
+        .dot.yellow { background: #ffcc00; box-shadow: 0 0 10px #ffcc00; }
+        .dot.green { background: #00ff00; box-shadow: 0 0 10px #00ff00; }
+
+        .terminal-title {
+            color: #00ff00;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: #00ff00;
+            text-align: center;
             font-size: 28px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
+            animation: textFlicker 3s linear infinite;
         }
 
-        .login-container input {
-            width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
+        @keyframes textFlicker {
+            0%, 100% { opacity: 1; }
+            92% { opacity: 1; }
+            93% { opacity: 0.8; }
+            94% { opacity: 1; }
+            95% { opacity: 0.9; }
+            96% { opacity: 1; }
         }
 
-        .login-container button {
+        .skull-icon {
+            text-align: center;
+            font-size: 60px;
+            margin-bottom: 15px;
+            color: #00ff00;
+            animation: pulse 2s ease-in-out infinite;
+            filter: drop-shadow(0 0 15px #00ff00);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .subtitle {
+            color: #ff3b3b;
+            text-align: center;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            color: #00ff00;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        .input-group label i {
+            margin-right: 8px;
+            color: #ff3b3b;
+        }
+
+        .input-group input {
             width: 100%;
             padding: 15px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 5px;
+            background: rgba(0, 255, 0, 0.05);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 3px;
+            color: #00ff00;
+            font-family: 'Share Tech Mono', monospace;
             font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #00ff00;
+            background: rgba(0, 255, 0, 0.1);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+        }
+
+        .input-group input::placeholder {
+            color: rgba(0, 255, 0, 0.4);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 15px;
+            background: transparent;
+            border: 2px solid #ff3b3b;
+            color: #ff3b3b;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
             cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
             margin-top: 10px;
         }
 
-        .login-container button:hover {
-            background: #5a6fd8;
+        .btn-login i {
+            margin-right: 10px;
         }
 
-        .error {
-            color: #e74c3c;
-            margin-top: 10px;
-            background: #ffeaea;
-            padding: 10px;
-            border-radius: 5px;
+        .btn-login::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 59, 59, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-login:hover::before {
+            left: 100%;
+        }
+
+        .btn-login:hover {
+            background: rgba(255, 59, 59, 0.2);
+            box-shadow: 0 0 30px rgba(255, 59, 59, 0.5);
+            text-shadow: 0 0 10px #ff3b3b;
+        }
+
+        .error-msg {
+            background: rgba(255, 59, 59, 0.1);
+            border: 1px solid #ff3b3b;
+            color: #ff3b3b;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 12px;
+            text-align: center;
+            animation: shake 0.5s ease;
+        }
+
+        .error-msg i {
+            margin-right: 8px;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .console-log {
+            margin-top: 25px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 255, 0, 0.2);
+            border-radius: 3px;
+            font-size: 10px;
+            color: rgba(0, 255, 0, 0.7);
+            max-height: 80px;
+            overflow: hidden;
+        }
+
+        .log-line {
+            margin-bottom: 3px;
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+        }
+
+        .log-line:nth-child(1) { animation-delay: 0.2s; }
+        .log-line:nth-child(2) { animation-delay: 0.5s; }
+        .log-line:nth-child(3) { animation-delay: 0.8s; }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .log-line .time { color: #666; }
+        .log-line .success { color: #00ff00; }
+        .log-line .warning { color: #ffcc00; }
+
+        .copyright {
+            text-align: center;
+            margin-top: 20px;
+            color: rgba(0, 255, 0, 0.4);
+            font-size: 10px;
+        }
+
+        /* Typing cursor animation */
+        .typing-cursor {
+            display: inline-block;
+            width: 8px;
+            height: 16px;
+            background: #00ff00;
+            animation: blink 1s infinite;
+            vertical-align: middle;
+            margin-left: 5px;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
         }
     </style>
 </head>
 <body>
+    <div class="grid-bg"></div>
+    <div class="scanlines"></div>
+    
+    <canvas class="matrix-bg" id="matrix"></canvas>
+
     <div class="login-container">
-        <h1>🦁 LionHook</h1>
-        <form method="POST">
-            <input type="text" name="username" placeholder="Username" required value="ONDORK">
-            <input type="password" name="password" placeholder="Password" required value="ONDORK">
-            <button type="submit">Login</button>
-        </form>
+        <div class="terminal-header">
+            <div class="terminal-dots">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+            </div>
+            <span class="terminal-title">cjspanel://secure-access</span>
+        </div>
+
+        <div class="skull-icon"><i class="fa-solid fa-skull"></i></div>
+        <h1>CJSPANEL</h1>
+        <p class="subtitle">[ Authorized Access Only ]</p>
+
         {% if error %}
-        <div class="error">{{ error }}</div>
+        <div class="error-msg">
+            <i class="fa-solid fa-triangle-exclamation"></i> {{ error }}
+        </div>
         {% endif %}
+
+        <form method="POST">
+            <div class="input-group">
+                <label><i class="fa-solid fa-user"></i> Username</label>
+                <input type="text" name="username" placeholder="Enter username..." autocomplete="off" required>
+            </div>
+            <div class="input-group">
+                <label><i class="fa-solid fa-lock"></i> Password</label>
+                <input type="password" name="password" placeholder="Enter password..." required>
+            </div>
+            <button type="submit" class="btn-login">
+                <i class="fa-solid fa-right-to-bracket"></i> Initialize Access
+            </button>
+        </form>
+
+        <div class="console-log">
+            <div class="log-line"><span class="time">[SYS]</span> <span class="success">Connection established...</span></div>
+            <div class="log-line"><span class="time">[SEC]</span> <span class="warning">Awaiting credentials...</span></div>
+            <div class="log-line"><span class="time">[NET]</span> <span class="success">Secure tunnel active</span></div>
+        </div>
+
+        <div class="copyright">
+            Cjspanel v1.0 | Penetration Testing Framework
+        </div>
     </div>
+
+    <script>
+        // Matrix rain effect
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()';
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        const drops = [];
+
+        for (let i = 0; i < columns; i++) {
+            drops[i] = Math.random() * canvas.height / fontSize;
+        }
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(10, 10, 10, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#00ff00';
+            ctx.font = fontSize + 'px Share Tech Mono';
+
+            for (let i = 0; i < drops.length; i++) {
+                const char = chars[Math.floor(Math.random() * chars.length)];
+                ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 50);
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
 </body>
 </html>
