@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>System Config - Cjspanel V1</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --green: #00ff00; --red: #ff3b3b; --bg-dark: #0a0a0a; --bg-card: rgba(0, 20, 0, 0.8); --border: rgba(0, 255, 0, 0.3); }
+        body { font-family: 'Share Tech Mono', monospace; background: var(--bg-dark); min-height: 100vh; color: var(--green); }
+        body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1000; background: repeating-linear-gradient(0deg, rgba(0,0,0,0.1), rgba(0,0,0,0.1) 1px, transparent 1px, transparent 2px); }
+        .sidebar { position: fixed; left: 0; top: 0; width: 280px; height: 100vh; background: var(--bg-card); border-right: 1px solid var(--border); padding: 20px; z-index: 100; }
+        .logo-section { text-align: center; padding: 20px 0; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+        .logo-icon { font-size: 50px; margin-bottom: 10px; color: var(--green); filter: drop-shadow(0 0 15px var(--green)); }
+        .logo-text { font-family: 'Orbitron', sans-serif; font-size: 24px; font-weight: 900; color: var(--green); text-shadow: 0 0 20px var(--green); }
+        .version-tag { font-size: 10px; color: var(--red); margin-top: 5px; }
+        .nav-menu { list-style: none; }
+        .nav-link { display: flex; align-items: center; padding: 15px; color: var(--green); text-decoration: none; border: 1px solid transparent; border-radius: 5px; transition: all 0.3s ease; font-size: 13px; text-transform: uppercase; }
+        .nav-link:hover, .nav-link.active { background: rgba(0,255,0,0.1); border-color: var(--green); }
+        .nav-link.active { color: var(--bg-dark); background: var(--green); }
+        .nav-link i { margin-right: 12px; font-size: 18px; width: 24px; text-align: center; }
+        .nav-link.danger { color: var(--red); }
+        .main-content { margin-left: 280px; padding: 30px; }
+        .header { padding-bottom: 20px; border-bottom: 1px solid var(--border); margin-bottom: 30px; }
+        .header-title { font-family: 'Orbitron', sans-serif; font-size: 28px; text-transform: uppercase; text-shadow: 0 0 20px var(--green); }
+        .settings-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 5px; padding: 30px; max-width: 500px; }
+        .settings-card h2 { font-family: 'Orbitron', sans-serif; font-size: 16px; color: var(--red); margin-bottom: 25px; text-transform: uppercase; letter-spacing: 2px; }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; color: var(--green); font-size: 11px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+        .input-group input { width: 100%; padding: 15px; background: rgba(0,255,0,0.05); border: 1px solid var(--border); border-radius: 3px; color: var(--green); font-family: 'Share Tech Mono', monospace; font-size: 14px; }
+        .btn-save { width: 100%; padding: 15px; background: transparent; border: 2px solid var(--green); color: var(--green); font-family: 'Orbitron', sans-serif; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: all 0.3s ease; }
+        .btn-save:hover { background: var(--green); color: var(--bg-dark); box-shadow: 0 0 30px rgba(0,255,0,0.5); }
+        .alert { padding: 15px; margin-bottom: 20px; border-radius: 3px; font-size: 12px; display: none; }
+        .alert-success { background: rgba(0,255,0,0.1); border: 1px solid var(--green); color: var(--green); }
+        .alert-error { background: rgba(255,59,59,0.1); border: 1px solid var(--red); color: var(--red); }
+        .info-section { margin-top: 30px; padding: 20px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 5px; }
+        .info-section h3 { color: var(--red); font-size: 12px; margin-bottom: 15px; text-transform: uppercase; }
+        .info-section p { font-size: 11px; color: rgba(0,255,0,0.7); line-height: 1.8; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo-section">
+            <div class="logo-icon"><i class="fa-solid fa-skull"></i></div>
+            <div class="logo-text">CJSPANEL</div>
+            <div class="version-tag">[ v1.0 // CLASSIFIED ]</div>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="dashboard.html" class="nav-link"><i class="fa-solid fa-satellite-dish"></i> Command Center</a></li>
+            <li class="nav-item"><a href="gallery.html" class="nav-link"><i class="fa-solid fa-database"></i> Data Vault</a></li>
+            <li class="nav-item"><a href="settings.html" class="nav-link active"><i class="fa-solid fa-gear"></i> System Config</a></li>
+            <li class="nav-item"><a href="#" id="logout-btn" class="nav-link danger"><i class="fa-solid fa-power-off"></i> Terminate Session</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1 class="header-title"><i class="fa-solid fa-gear"></i> System Configuration</h1>
+        </div>
+
+        <div class="settings-card">
+            <h2><i class="fa-solid fa-shield-halved"></i> Access Credentials</h2>
+            <div id="alert-box" class="alert"></div>
+            <form id="settings-form">
+                <div class="input-group">
+                    <label><i class="fa-solid fa-user"></i> Username</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="input-group">
+                    <label><i class="fa-solid fa-lock"></i> New Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter new password..." required>
+                </div>
+                <button type="submit" class="btn-save"><i class="fa-solid fa-floppy-disk"></i> Update Credentials</button>
+            </form>
+
+            <div class="info-section">
+                <h3><i class="fa-solid fa-circle-info"></i> System Information</h3>
+                <p>
+                    <strong>Version:</strong> Cjspanel v1.0 [Decoupled]<br>
+                    <strong>Status:</strong> Operational (Cloud Ready)<br>
+                    <strong>Backend:</strong> Render.com (Flask API)<br>
+                    <strong>Database:</strong> Supabase (PostgreSQL)<br>
+                    <strong>Storage:</strong> Supabase S3
+                </p>
+            </div>
+        </div>
+
+        <div class="settings-card" style="margin-top: 30px; border-color: var(--red);">
+            <h2 style="color: var(--red);"><i class="fa-solid fa-skull-crossbones"></i> Danger Zone</h2>
+            <p style="font-size: 12px; color: rgba(255,59,59,0.8); margin-bottom: 20px;">
+                Warning: These actions are irreversible and will permanently delete all data.
+            </p>
+            <button id="clear-db-btn" class="btn-save" style="border-color: var(--red); color: var(--red);">
+                <i class="fa-solid fa-trash-can"></i> Clear All Database
+            </button>
+        </div>
+    </div>
+
+    <script type="module">
+        import CONFIG from './js/config.js';
+
+        const alertBox = document.getElementById('alert-box');
+        function showAlert(type, msg) {
+            alertBox.className = `alert alert-${type}`;
+            alertBox.style.display = 'block';
+            alertBox.innerHTML = msg;
+        }
+
+        async function loadSettings() {
+            try {
+                const res = await fetch(`${CONFIG.API_BASE_URL}/api/settings`);
+                if (res.status === 401) window.location.href = 'login.html';
+                const data = await res.json();
+                document.getElementById('username').value = data.username;
+            } catch (err) { showAlert('error', 'Failed to load system settings'); }
+        }
+
+        document.getElementById('settings-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const res = await fetch(`${CONFIG.API_BASE_URL}/api/settings`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await res.json();
+                if (data.status === 'success') showAlert('success', 'Credentials updated successfully');
+                else showAlert('error', data.error || 'Update failed');
+            } catch (err) { showAlert('error', 'Server update failed'); }
+        };
+
+        document.getElementById('clear-db-btn').onclick = async () => {
+            if (confirm('⚠️ WARNING: This will delete ALL devices and captured data!\n\nAre you sure?') &&
+                confirm('This action cannot be undone. Type "DELETE" in the next prompt to confirm.')) {
+                if (prompt('Type DELETE to confirm:') === 'DELETE') {
+                    try {
+                        const res = await fetch(`${CONFIG.API_BASE_URL}/api/clear_database`, { method: 'POST' });
+                        const data = await res.json();
+                        if (data.status === 'success') {
+                            alert('Database cleared');
+                            window.location.reload();
+                        }
+                    } catch (err) { alert('Clear failed'); }
+                }
+            }
+        };
+
+        document.getElementById('logout-btn').onclick = async () => {
+            await fetch(`${CONFIG.API_BASE_URL}/api/logout`, { method: 'POST' });
+            window.location.href = 'login.html';
+        };
+
+        loadSettings();
+    </script>
+</body>
+</html>

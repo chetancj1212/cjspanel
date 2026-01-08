@@ -1,0 +1,29 @@
+# Render deployment configuration for Cjspanel API
+services:
+  - type: web
+    name: cjspanel-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn main:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: PRODUCTION
+        value: true
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: SUPABASE_URL
+        value: https://jblrvyhjeqsmdxuyjobs.supabase.co
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        # User should set this in Render dashboard for security, but putting placeholder here
+        sync: false
+      - key: DATABASE_URL
+        value: postgresql://postgres:Cjprime%40121212@db.jblrvyhjeqsmdxuyjobs.supabase.co:5432/postgres
+      - key: STORAGE_BUCKET
+        value: cjspanel-data
+      - key: ALLOWED_ORIGINS
+        # Replace with your Netlify URL once deployed
+        value: "*"
+    healthCheckPath: /api/stats
+    autoDeploy: true

@@ -1,0 +1,21 @@
+[build]
+  command = ""
+  publish = "public"
+
+[view]
+  # Netlify will serve index.html for the root
+  # Custom headers for security
+  [[headers]]
+    for = "/*"
+    [headers.values]
+      X-Frame-Options = "DENY"
+      X-XSS-Protection = "1; mode=block"
+      X-Content-Type-Options = "nosniff"
+      Referrer-Policy = "strict-origin-when-cross-origin"
+
+# SPA redirection for cleaner URLs (if needed)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = false

