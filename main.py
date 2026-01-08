@@ -35,7 +35,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=24)
 
 # CORS configuration - Allow the Netlify frontend
 # In production, replace '*' with your specific Netlify URL
-ALLOWED_ORIGINS = os.environ.get('ALLOWED_ORIGINS', '*').split(',')
+ALLOWED_ORIGINS = os.environ.get('ALLOWED_ORIGINS', 'https://cjspanel.netlify.app').split(',')
 CORS(app, origins=ALLOWED_ORIGINS, supports_credentials=True)
 
 # Rate limiting
