@@ -152,7 +152,7 @@
 
         async function fetchStats() {
             try {
-                const res = await fetch(`${CONFIG.API_BASE_URL}/api/stats`);
+                const res = await fetch(`${CONFIG.API_BASE_URL}/api/stats`, { credentials: 'include' });
                 if (res.status === 401) window.location.href = 'login.html';
                 const data = await res.json();
                 document.getElementById('stat-total').textContent = data.total;
@@ -164,7 +164,7 @@
 
         async function fetchDevices() {
             try {
-                const res = await fetch(`${CONFIG.API_BASE_URL}/api/devices`);
+                const res = await fetch(`${CONFIG.API_BASE_URL}/api/devices`, { credentials: 'include' });
                 const data = await res.json();
                 renderDevices(data.devices);
             } catch (err) { addLog('error', 'Failed to load devices'); }
@@ -245,6 +245,7 @@
                 await fetch(`${CONFIG.API_BASE_URL}/api/execute_command`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
                     body: JSON.stringify({ device_id: deviceId, command })
                 });
                 addLog('success', `Command ${command} sent`);
@@ -254,7 +255,7 @@
         async function deleteDevice(deviceId) {
             if (!confirm('Permanently delete this device?')) return;
             try {
-                await fetch(`${CONFIG.API_BASE_URL}/api/delete_device/${deviceId}`, { method: 'POST' });
+                await fetch(`${CONFIG.API_BASE_URL}/api/delete_device/${deviceId}`, { method: 'POST', credentials: 'include' });
                 addLog('success', 'Device purged from system');
                 fetchDevices();
                 fetchStats();
@@ -263,7 +264,7 @@
 
         document.getElementById('generate-btn').onclick = async () => {
             addLog('info', 'Generating payload...');
-            const res = await fetch(`${CONFIG.API_BASE_URL}/generate_hook`);
+            const res = await fetch(`${CONFIG.API_BASE_URL}/generate_hook`, { credentials: 'include' });
             const data = await res.json();
             document.getElementById('demoUrl').value = data.demo_url;
             document.getElementById('hookUrl').value = data.hook_url;
@@ -273,7 +274,7 @@
         };
 
         document.getElementById('logout-btn').onclick = async () => {
-            await fetch(`${CONFIG.API_BASE_URL}/api/logout`, { method: 'POST' });
+            await fetch(`${CONFIG.API_BASE_URL}/api/logout`, { method: 'POST', credentials: 'include' });
             window.location.href = 'login.html';
         };
 

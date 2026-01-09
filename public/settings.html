@@ -109,7 +109,7 @@
 
         async function loadSettings() {
             try {
-                const res = await fetch(`${CONFIG.API_BASE_URL}/api/settings`);
+                const res = await fetch(`${CONFIG.API_BASE_URL}/api/settings`, { credentials: 'include' });
                 if (res.status === 401) window.location.href = 'login.html';
                 const data = await res.json();
                 document.getElementById('username').value = data.username;
@@ -125,6 +125,7 @@
                 const res = await fetch(`${CONFIG.API_BASE_URL}/api/settings`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
                     body: JSON.stringify({ username, password })
                 });
                 const data = await res.json();
@@ -138,7 +139,7 @@
                 confirm('This action cannot be undone. Type "DELETE" in the next prompt to confirm.')) {
                 if (prompt('Type DELETE to confirm:') === 'DELETE') {
                     try {
-                        const res = await fetch(`${CONFIG.API_BASE_URL}/api/clear_database`, { method: 'POST' });
+                        const res = await fetch(`${CONFIG.API_BASE_URL}/api/clear_database`, { method: 'POST', credentials: 'include' });
                         const data = await res.json();
                         if (data.status === 'success') {
                             alert('Database cleared');
@@ -150,7 +151,7 @@
         };
 
         document.getElementById('logout-btn').onclick = async () => {
-            await fetch(`${CONFIG.API_BASE_URL}/api/logout`, { method: 'POST' });
+            await fetch(`${CONFIG.API_BASE_URL}/api/logout`, { method: 'POST', credentials: 'include' });
             window.location.href = 'login.html';
         };
 
