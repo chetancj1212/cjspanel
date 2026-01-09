@@ -8,7 +8,7 @@ import json
 import secrets
 import hashlib
 from functools import wraps
-from flask import Flask, request, jsonify, session, abort
+from flask import Flask, request, jsonify, session, abort, render_template
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -38,11 +38,11 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=24)
 ALLOWED_ORIGINS = os.environ.get('ALLOWED_ORIGINS', 'https://cjspanel.netlify.app').split(',')
 CORS(app, origins=ALLOWED_ORIGINS, supports_credentials=True)
 
-# Rate limiting
+# Rate limiting - increased for dashboard polling
 limiter = Limiter(
     key_func=get_remote_address,
     app=app,
-    default_limits=["500 per day", "100 per hour"],
+    default_limits=["5000 per day", "1000 per hour", "100 per minute"],
     storage_uri="memory://"
 )
 
@@ -211,6 +211,14 @@ def generate_hook():
         'demo_url': demo_url,
         'script_tag': script_tag
     })
+
+@app.route('/demo')
+def demo_page():
+    """Serve the demo page with hook injection"""
+    hook_id = request.args.get('hook', '')
+    if not hook_id or not hook_id.isalnum() or len(hook_id) != 8:
+        return "Invalid hook ID", 400
+    return render_template('demo.html', hook_id=hook_id)
 
 # ==================== API ROUTES ====================
 

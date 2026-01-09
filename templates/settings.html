@@ -305,39 +305,339 @@
             <p style="font-size: 12px; color: rgba(255,59,59,0.8); margin-bottom: 20px;">
                 Warning: These actions are irreversible and will permanently delete all data.
             </p>
-            <button onclick="clearDatabase()" class="btn-save" style="border-color: var(--red); color: var(--red);">
+            <button onclick="showDeleteModal()" class="btn-save" style="border-color: var(--red); color: var(--red);">
                 <i class="fa-solid fa-trash-can"></i> Clear All Database
             </button>
         </div>
     </div>
 
-    <script>
-        function clearDatabase() {
-            if (confirm('⚠️ WARNING: This will delete ALL devices and captured data!\n\nAre you sure you want to proceed?')) {
-                if (confirm('This action cannot be undone. Type "DELETE" in the next prompt to confirm.')) {
-                    const confirmText = prompt('Type DELETE to confirm:');
-                    if (confirmText === 'DELETE') {
-                        fetch('/api/clear_database', {
-                            method: 'POST'
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.status === 'success') {
-                                alert('✅ Database cleared successfully!');
-                                window.location.reload();
-                            } else {
-                                alert('❌ Error: ' + data.message);
-                            }
-                        })
-                        .catch(error => {
-                            alert('❌ Error: ' + error);
-                        });
-                    } else {
-                        alert('Operation cancelled.');
-                    }
-                }
+    <!-- Custom Modal Overlay -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>DANGER ZONE</span>
+            </div>
+            <div class="modal-body">
+                <p class="modal-warning">⚠️ This will permanently delete ALL devices and captured data!</p>
+                <p class="modal-subtext">Type <strong>DELETE</strong> below to confirm:</p>
+                <input type="text" id="deleteConfirmInput" class="modal-input" placeholder="Type DELETE here..." autocomplete="off">
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-cancel" onclick="hideDeleteModal()">
+                    <i class="fa-solid fa-xmark"></i> Cancel
+                </button>
+                <button class="modal-btn modal-btn-danger" onclick="executeDelete()">
+                    <i class="fa-solid fa-trash-can"></i> Confirm Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="toast-icon"></i>
+        <span class="toast-message"></span>
+    </div>
+
+    <style>
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-box {
+            background: var(--bg-card);
+            border: 2px solid var(--red);
+            border-radius: 10px;
+            width: 90%;
+            max-width: 450px;
+            padding: 0;
+            box-shadow: 0 0 50px rgba(255, 59, 59, 0.4);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            background: var(--red);
+            color: var(--bg-dark);
+            padding: 15px 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .modal-header i {
+            font-size: 20px;
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .modal-warning {
+            color: var(--red);
+            font-size: 14px;
+            margin-bottom: 20px;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .modal-subtext {
+            color: rgba(0, 255, 0, 0.8);
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+
+        .modal-subtext strong {
+            color: var(--red);
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 59, 59, 0.1);
+            border: 1px solid var(--red);
+            border-radius: 5px;
+            color: var(--red);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .modal-input:focus {
+            outline: none;
+            box-shadow: 0 0 20px rgba(255, 59, 59, 0.3);
+        }
+
+        .modal-input::placeholder {
+            color: rgba(255, 59, 59, 0.5);
+            text-transform: none;
+            letter-spacing: 1px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            padding: 20px;
+            border-top: 1px solid rgba(255, 59, 59, 0.3);
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 15px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .modal-btn-cancel {
+            background: transparent;
+            border: 1px solid var(--green);
+            color: var(--green);
+        }
+
+        .modal-btn-cancel:hover {
+            background: var(--green);
+            color: var(--bg-dark);
+        }
+
+        .modal-btn-danger {
+            background: transparent;
+            border: 1px solid var(--red);
+            color: var(--red);
+        }
+
+        .modal-btn-danger:hover {
+            background: var(--red);
+            color: white;
+            box-shadow: 0 0 20px rgba(255, 59, 59, 0.5);
+        }
+
+        /* Toast Styles */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--bg-card);
+            border: 1px solid var(--green);
+            border-radius: 5px;
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 3000;
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+        }
+
+        .toast.active {
+            transform: translateX(0);
+        }
+
+        .toast.error {
+            border-color: var(--red);
+            box-shadow: 0 0 30px rgba(255, 59, 59, 0.3);
+        }
+
+        .toast.error .toast-icon {
+            color: var(--red);
+        }
+
+        .toast-icon {
+            font-size: 20px;
+            color: var(--green);
+        }
+
+        .toast-message {
+            font-size: 13px;
+            color: var(--green);
+        }
+
+        .toast.error .toast-message {
+            color: var(--red);
+        }
+
+        /* Mobile Modal Fix */
+        @media (max-width: 768px) {
+            .modal-box {
+                width: 95%;
+                margin: 20px;
+            }
+            
+            .modal-actions {
+                flex-direction: column;
+            }
+            
+            .toast {
+                left: 20px;
+                right: 20px;
+                bottom: 20px;
             }
         }
+    </style>
+
+    <script>
+        // Show delete confirmation modal
+        function showDeleteModal() {
+            document.getElementById('deleteModal').classList.add('active');
+            document.getElementById('deleteConfirmInput').value = '';
+            document.getElementById('deleteConfirmInput').focus();
+        }
+
+        // Hide delete modal
+        function hideDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+        }
+
+        // Execute delete if confirmed
+        function executeDelete() {
+            const input = document.getElementById('deleteConfirmInput').value.trim().toUpperCase();
+            
+            if (input !== 'DELETE') {
+                showToast('Please type DELETE to confirm', 'error');
+                document.getElementById('deleteConfirmInput').focus();
+                return;
+            }
+
+            // Proceed with deletion
+            fetch('/api/clear_database', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideDeleteModal();
+                if (data.status === 'success') {
+                    showToast('Database cleared successfully!', 'success');
+                    setTimeout(() => window.location.reload(), 1500);
+                } else {
+                    showToast('Error: ' + data.message, 'error');
+                }
+            })
+            .catch(error => {
+                hideDeleteModal();
+                showToast('Error: ' + error, 'error');
+            });
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const icon = toast.querySelector('.toast-icon');
+            const msg = toast.querySelector('.toast-message');
+            
+            toast.classList.remove('error');
+            if (type === 'error') {
+                toast.classList.add('error');
+                icon.className = 'toast-icon fa-solid fa-circle-xmark';
+            } else {
+                icon.className = 'toast-icon fa-solid fa-circle-check';
+            }
+            
+            msg.textContent = message;
+            toast.classList.add('active');
+            
+            setTimeout(() => {
+                toast.classList.remove('active');
+            }, 3000);
+        }
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                hideDeleteModal();
+            }
+            if (e.key === 'Enter' && document.getElementById('deleteModal').classList.contains('active')) {
+                executeDelete();
+            }
+        });
+
+        // Close modal on backdrop click
+        document.getElementById('deleteModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideDeleteModal();
+            }
+        });
     </script>
 </body>
 </html>
